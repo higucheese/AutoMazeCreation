@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <iostream>
 
 #include "Header.h"
 #include "param.h"
@@ -8,10 +9,13 @@ int FlowDirection(int); //‘OX‰ñŒ@‚Á‚½•ûŒü‚Ì‹t•ûŒü‚ÍŒ@‚ç‚È‚¢‚æ‚¤‚É‚µ‚Ä‚¢‚é
 bool BottiLeaving(void);
 void BottiConnect(void); //ˆêƒ}ƒX‚¾‚¯c‚Á‚½‚Æ‚±‚ë‚ğ‰½‚Æ‚©‚·‚é
 void DestMine(int, int, int, int);
+bool ExpandMine(void);
+void RoadExpand(int, int);
+bool SearchLeaving(void);
 coordinate Mine(0, 0); //Œ@‚éêŠ
+coordinate FlowSearch(1, 1), FlowSearch_(1, 1);
 
-
-void FreeFlow(void) {
+bool FreeFlow(void) {
 	for (k = 0; k < WIDTH; k++) {
 		for (l = 0; l < HIGHT; l++) {
 			if (!(k == 0 || l == 0 || k == WIDTH - 1 || l == HIGHT - 1)) {
@@ -105,9 +109,14 @@ void FreeFlow(void) {
 			}
 		}
 	}
-	/*while (BottiLeaving()) {
+	while (BottiLeaving()) {
 		BottiConnect();
-	}*/
+	}
+	if (!ExpandMine()) {
+		return false;
+	}
+
+	return true;
 }
 
 int FlowDirection(int forbiddendir) {
@@ -120,17 +129,10 @@ int FlowDirection(int forbiddendir) {
 
 bool BottiLeaving(void) {
 	int bottipanel = 0;
-	int tx, ty, count;
 	for (k = 1; k < WIDTH - 1; k++) {
 		for (l = 1; l < HIGHT - 1; l++) {
 			searchpanel[k][l] = 0;
-			count = 0;
-			for (tx = -1; tx <= 1; tx++) {
-				for (ty = -1; ty <= 1; ty++) {
-					if (mazepanel[tx + k][ty + l] == 1) count++;
-				}
-			}
-			if (count == 8) {
+			if (WallCountUp(k, l) == 8) {
 				searchpanel[k][l] = 1;
 				bottipanel++;
 			}
@@ -257,4 +259,130 @@ void DestMine(int x1, int y1, int x2, int y2) {
 		}
 	}
 	delete[] p;
+}
+
+bool ExpandMine(void) {
+	for (k = 1; k < WIDTH - 1; k++) {
+		for (l = 1; l < HIGHT - 1; l++) {
+			searchpanel[k][l] = 0;
+		}
+	}
+	int count = 0;
+	while (SearchLeaving()) {
+		count++;
+		if (count > 1000) return false;
+		for (k = 1; k < WIDTH - 1; k++) {
+			for (l = 1; l < HIGHT - 1; l++) {
+				mazevector[k][l] = 0;
+				if (mazepanel[k][l] == 2) {
+					mazepanel[k][l] = 0;
+				}
+				if (k % 2 == 1 && l % 2 == 1) {
+					if (WallCountUp(k, l) == 7) {
+						mazepanel[k][l] = 2;
+						if (mazepanel[k][l - 1] == 0) {
+							mazevector[k][l] = 0;
+						}
+						if (mazepanel[k - 1][l] == 0) {
+							mazevector[k][l] = 1;
+						}
+						if (mazepanel[k][l + 1] == 0) {
+							mazevector[k][l] = 2;
+						}
+						if (mazepanel[k + 1][l] == 0) {
+							mazevector[k][l] = 3;
+						}
+					}
+				}
+			}
+		}
+		RoadExpand(Mine.x, Mine.y);
+		do {
+			Mine.x = rand() % (WIDTH - 1);
+			Mine.y = rand() % (HIGHT - 1);
+		} while (Mine.x % 2 == 0 || Mine.y % 2 == 0 || mazepanel[Mine.x][Mine.y] != 2);
+	}
+	return true;
+}
+
+void RoadExpand(int x, int y) {
+	FlowSearch.x = x;
+	FlowSearch.y = y;
+	FlowSearch_.x = x;
+	FlowSearch_.y = y;
+
+	if (mazepanel[x][y] == 2) {
+		while (1) {
+			if (mazepanel[FlowSearch.x][FlowSearch.y - 1] == 0 && searchpanel[FlowSearch.x][FlowSearch.y - 2] != 1) {
+				searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+				FlowSearch.y -= 2;
+			}
+			if (mazepanel[FlowSearch.x - 1][FlowSearch.y] == 0 && searchpanel[FlowSearch.x - 2][FlowSearch.y] != 1) {
+				searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+				FlowSearch.x -= 2;
+			}
+			if (mazepanel[FlowSearch.x][FlowSearch.y + 1] == 0 && searchpanel[FlowSearch.x][FlowSearch.y + 2] != 1) {
+				searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+				FlowSearch.y += 2;
+			}
+			if (mazepanel[FlowSearch.x + 1][FlowSearch.y] == 0 && searchpanel[FlowSearch.x + 2][FlowSearch.y] != 1) {
+				searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+				FlowSearch.x += 2;
+			}
+
+			if (mazepanel[FlowSearch.x][FlowSearch.y] == 2 && searchpanel[FlowSearch.x][FlowSearch.y] != 1) {
+				switch (mazevector[FlowSearch.x][FlowSearch.y]) {
+				case 0:
+					if (FlowSearch.y + 2 < HIGHT - 1 && mazepanel[FlowSearch.x][FlowSearch.y + 2] == 2) {
+						mazepanel[FlowSearch.x][FlowSearch.y + 1] = 0;
+						searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+						FlowSearch.y += 2;
+					}
+					break;
+				case 1:
+					if (FlowSearch.x + 2 < WIDTH - 1 && mazepanel[FlowSearch.x + 2][FlowSearch.y] == 2) {
+						mazepanel[FlowSearch.x + 1][FlowSearch.y] = 0;
+						searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+						FlowSearch.x += 2;
+					}
+					break;
+				case 2:
+					if (FlowSearch.y - 2 > 0 && mazepanel[FlowSearch.x][FlowSearch.y - 2] == 2) {
+						mazepanel[FlowSearch.x][FlowSearch.y - 1] = 0;
+						searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+						FlowSearch.y -= 2;
+					}
+					break;
+				case 3:
+					if (FlowSearch.x - 2 > 0 && mazepanel[FlowSearch.x - 2][FlowSearch.y] == 2) {
+						mazepanel[FlowSearch.x - 1][FlowSearch.y] = 0;
+						searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+						FlowSearch.x -= 2;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+			if (FlowSearch.x == FlowSearch_.x && FlowSearch.y == FlowSearch_.y) {
+				searchpanel[FlowSearch.x][FlowSearch.y] = 1;
+				break;
+			}
+			else {
+				FlowSearch_.x = FlowSearch.x;
+				FlowSearch_.y = FlowSearch.y;
+			}
+		}
+	}
+}
+
+bool SearchLeaving(void) {
+	for (k = 1; k < WIDTH - 1; k++) {
+		for (l = 1; l < HIGHT - 1; l++) {
+			if (k % 2 == 1 && l % 2 == 1 && searchpanel[k][l] == 0) {
+				return true;
+			}
+		}
+	}
+	return false;
 }

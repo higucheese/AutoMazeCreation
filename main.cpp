@@ -11,6 +11,7 @@ using namespace std;
 int i, j;
 int mazepanel[WIDTH][HIGHT];
 int searchpanel[WIDTH][HIGHT];
+int mazevector[WIDTH][HIGHT];
 coordinate Start(1, 1), Goal(WIDTH - 2, HIGHT - 2);
 
 inline void InitRand();
@@ -33,7 +34,9 @@ int main(void) {
 			}
 		}
 		/*freeflow*/
-		FreeFlow();
+		if (!FreeFlow()) {
+			continue;
+		}
 
 		/*
 		–À˜H‰ð–@
@@ -46,7 +49,7 @@ int main(void) {
 		*/
 
 		/*****•\Ž¦•”•ª*****/
-		
+
 		for (i = 0; i < WIDTH; i++) {
 			for (j = 0; j < HIGHT; j++) {
 				setCursorPos(2 * i, j);
@@ -56,23 +59,17 @@ int main(void) {
 					break;
 				case 2:
 					cout << "{";
+					//cout << mazevector[i][j];
 					break;
 				default:
 					break;
 				}
-				
-				if (i == Start.x && j == Start.y) {
+				if (searchpanel[i][j] == 1) {
 					setCursorPos(2 * i, j);
-					cout << "‚r";
+					cout << "–";
 				}
-				if (i == Goal.x && j == Goal.y) {
-					setCursorPos(2 * i, j);
-					cout << "‚f";
-				}
-				
 			}
 		}
-		
 		getchar();
 		for (i = 0; i < WIDTH; i++) {
 			for (j = 0; j < HIGHT; j++) {
@@ -81,9 +78,20 @@ int main(void) {
 			}
 		}
 	}
+
 	return 0;
 }
 
 inline void InitRand() {
 	srand((unsigned int)time(NULL));
+}
+
+int WallCountUp(int x, int y) {
+	int tx, ty, count = 0;
+	for (tx = -1; tx <= 1; tx++) {
+		for (ty = -1; ty <= 1; ty++) {
+			if (mazepanel[tx + k][ty + l] == 1) count++;
+		}
+	}
+	return count;
 }
