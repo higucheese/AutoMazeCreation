@@ -6,9 +6,6 @@
 
 int k, l;
 
-int Direction(void); //0:UP 1:LEFT 2:DOWN 3:RIGHT
-bool MineLeaving(void); //Œ@‚èŽc‚µ‚ª‚ ‚é‚Æ‚«true‚ð•Ô‚·
-
 void Anahori(void) {
 	for (k = 0; k < WIDTH; k++) {
 		for (l = 0; l < HIGHT; l++) {
@@ -114,7 +111,7 @@ bool MineLeaving(void) {
 					if (mazepanel[tx + k][ty + l] == 1) count++;
 				}
 			}
-			if (count >= 8) return true;
+			if (count >= SEARCHNUM) return true;
 		}
 	}
 	return false;

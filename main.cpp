@@ -32,19 +32,21 @@ int main(void) {
 				}
 			}
 		}
+		/*freeflow*/
+		FreeFlow();
 
-		/*穴掘り法*/
-		Anahori();
-
-		/*迷路解法*/
+		/*
+		迷路解法
 		for (i = 0; i < WIDTH; i++) {
 			for (j = 0; j < HIGHT; j++) {
 				searchpanel[i][j] = 0;
 			}
 		}
 		Search(Start.x, Start.y); //これをコメントアウトすると解法が表示されなくなる
+		*/
 
 		/*****表示部分*****/
+		
 		for (i = 0; i < WIDTH; i++) {
 			for (j = 0; j < HIGHT; j++) {
 				setCursorPos(2 * i, j);
@@ -58,6 +60,7 @@ int main(void) {
 				default:
 					break;
 				}
+				
 				if (i == Start.x && j == Start.y) {
 					setCursorPos(2 * i, j);
 					cout << "Ｓ";
@@ -66,8 +69,10 @@ int main(void) {
 					setCursorPos(2 * i, j);
 					cout << "Ｇ";
 				}
+				
 			}
 		}
+		
 		getchar();
 		for (i = 0; i < WIDTH; i++) {
 			for (j = 0; j < HIGHT; j++) {

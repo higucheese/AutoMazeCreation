@@ -4,7 +4,7 @@
 
 
 /*•Ï”éŒ¾*/
-extern int i, j;
+extern int i, j, k, l;
 extern int mazepanel[WIDTH][HIGHT];
 extern int searchpanel[WIDTH][HIGHT];
 
@@ -22,6 +22,14 @@ extern coordinate Start, Goal;
 
 /*ŒŠŒ@‚è–@*/
 void Anahori(void);
+int Direction(void); //0:UP 1:LEFT 2:DOWN 3:RIGHT
+bool MineLeaving(void); //Œ@‚èc‚µ‚ª‚ ‚é‚Æ‚«true‚ğ•Ô‚·
+
+/*freeflow*/
+void FreeFlow(void);
 
 /*–À˜H’Tõ*/
 bool Search(int x, int y);
+
+/*”z—ñ•À‚×‘Ö‚¦*/
+void shuffle(int ary[], int size);
