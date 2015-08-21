@@ -34,10 +34,7 @@ int main(void) {
 			}
 		}
 		/*freeflow*/
-		if (!FreeFlow()) {
-			continue;
-		}
-
+		FreeFlow();
 		/*
 		–À˜H‰ð–@
 		for (i = 0; i < WIDTH; i++) {

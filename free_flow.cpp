@@ -9,13 +9,13 @@ int FlowDirection(int); //前々回掘った方向の逆方向は掘らないようにしている
 bool BottiLeaving(void);
 void BottiConnect(void); //一マスだけ残ったところを何とかする
 void DestMine(int, int, int, int);
-bool ExpandMine(void);
+void ExpandMine(void);
 void RoadExpand(int, int);
 bool SearchLeaving(void);
 coordinate Mine(0, 0); //掘る場所
 coordinate FlowSearch(1, 1), FlowSearch_(1, 1);
 
-bool FreeFlow(void) {
+void FreeFlow(void) {
 	for (k = 0; k < WIDTH; k++) {
 		for (l = 0; l < HIGHT; l++) {
 			if (!(k == 0 || l == 0 || k == WIDTH - 1 || l == HIGHT - 1)) {
@@ -112,11 +112,7 @@ bool FreeFlow(void) {
 	while (BottiLeaving()) {
 		BottiConnect();
 	}
-	if (!ExpandMine()) {
-		return false;
-	}
-
-	return true;
+	ExpandMine();
 }
 
 int FlowDirection(int forbiddendir) {
@@ -261,16 +257,13 @@ void DestMine(int x1, int y1, int x2, int y2) {
 	delete[] p;
 }
 
-bool ExpandMine(void) {
+void ExpandMine(void) {
 	for (k = 1; k < WIDTH - 1; k++) {
 		for (l = 1; l < HIGHT - 1; l++) {
 			searchpanel[k][l] = 0;
 		}
 	}
-	int count = 0;
 	while (SearchLeaving()) {
-		count++;
-		if (count > 1000) return false;
 		for (k = 1; k < WIDTH - 1; k++) {
 			for (l = 1; l < HIGHT - 1; l++) {
 				mazevector[k][l] = 0;
@@ -302,7 +295,6 @@ bool ExpandMine(void) {
 			Mine.y = rand() % (HIGHT - 1);
 		} while (Mine.x % 2 == 0 || Mine.y % 2 == 0 || mazepanel[Mine.x][Mine.y] != 2);
 	}
-	return true;
 }
 
 void RoadExpand(int x, int y) {

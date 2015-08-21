@@ -27,7 +27,7 @@ int Direction(void); //0:UP 1:LEFT 2:DOWN 3:RIGHT
 bool MineLeaving(void); //Œ@‚èc‚µ‚ª‚ ‚é‚Æ‚«true‚ğ•Ô‚·
 
 /*freeflow*/
-bool FreeFlow(void);
+void FreeFlow(void);
 
 /*–À˜H’Tõ*/
 bool Search(int x, int y);
